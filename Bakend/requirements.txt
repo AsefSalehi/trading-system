@@ -1,0 +1,52 @@
+# FastAPI and web framework
+fastapi
+uvicorn[standard]
+
+# Database
+sqlalchemy
+asyncpg
+alembic
+
+# Redis and caching
+redis
+aioredis
+
+# Background tasks
+celery
+flower
+
+# HTTP client for external APIs
+httpx
+aiohttp
+
+# Data validation and serialization
+pydantic
+pydantic-settings
+
+# Security
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
+
+# Environment and configuration
+python-dotenv
+
+# Testing
+pytest
+pytest-asyncio
+pytest-cov
+httpx
+
+# Rate limiting
+slowapi
+
+# Monitoring and logging
+prometheus-client
+
+# Development tools
+black
+flake8
+mypy
+
+# Load testing
+locust
