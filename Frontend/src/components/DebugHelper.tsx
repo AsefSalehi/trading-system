@@ -7,7 +7,7 @@ import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
 export const DebugHelper: React.FC = () => {
-  const { isAuthenticated, user, logout } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
   if (import.meta.env.PROD) {
     return null; // Don't show in production
