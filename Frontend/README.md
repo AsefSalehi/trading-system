@@ -1,60 +1,103 @@
 # Trading System Frontend
 
-A modern React TypeScript frontend for the cryptocurrency trading system, built with Vite, TailwindCSS, and shadcn/ui.
+A modern React-based frontend for the cryptocurrency trading system, built with TypeScript, Vite, and Tailwind CSS.
 
 ## Features
 
-- **Modern Stack**: React 19 + TypeScript + Vite
-- **Styling**: TailwindCSS with shadcn/ui components
-- **Data Fetching**: TanStack Query (React Query) for efficient API calls
-- **Real-time Updates**: Automatic data refresh every 30 seconds
-- **Responsive Design**: Mobile-first responsive layout
-- **Docker Support**: Development and production Docker configurations
+### 🔐 Authentication
+- User registration and login
+- JWT token-based authentication
+- Secure session management
+- Role-based access control
 
-## Quick Start
+### 📊 Market Dashboard
+- Real-time cryptocurrency listings
+- Price charts and market data
+- Top performers and market trends
+- Advanced filtering and sorting
 
-### Development
+### 💰 Trading
+- Buy/sell cryptocurrency orders
+- Real-time portfolio tracking
+- Transaction history
+- Wallet management
 
+### 📈 Portfolio Management
+- Holdings overview with P&L
+- Portfolio allocation charts
+- Performance analytics
+- Asset diversification tracking
+
+### ⚠️ Risk Analysis
+- Comprehensive risk assessment
+- Risk metrics and scoring
+- Real-time risk alerts
+- Personalized recommendations
+
+## Technology Stack
+
+- **React 19** - Modern React with hooks
+- **TypeScript** - Type-safe development
+- **Vite** - Fast build tool and dev server
+- **Tailwind CSS** - Utility-first CSS framework
+- **React Query** - Server state management
+- **Axios** - HTTP client for API calls
+- **Lucide React** - Beautiful icons
+
+## Getting Started
+
+### Prerequisites
+- Node.js 18+ 
+- npm or yarn
+- Backend API running on port 8000
+
+### Installation
+
+1. Install dependencies:
 ```bash
-# Install dependencies
 npm install
+```
 
-# Start development server
+2. Set up environment variables:
+```bash
+cp .env.example .env
+```
+
+3. Start the development server:
+```bash
 npm run dev
 ```
 
 The application will be available at `http://localhost:5173`
 
-### Production Build
+### Build for Production
 
 ```bash
-# Build for production
 npm run build
+```
 
-# Preview production build
+### Preview Production Build
+
+```bash
 npm run preview
 ```
 
-### Docker Development
+## API Integration
 
-```bash
-# Start with Docker Compose (includes backend)
-docker-compose up frontend-dev
+The frontend integrates with the FastAPI backend through:
 
-# Or build and run manually
-docker build -t trading-frontend --target development .
-docker run -p 5173:5173 trading-frontend
-```
+- **Authentication API** - User login/register, token management
+- **Cryptocurrency API** - Market data, price history, sync operations
+- **Trading API** - Wallet operations, buy/sell orders, transactions
+- **Risk API** - Risk assessment, metrics, alerts
+- **Portfolio API** - Holdings, performance tracking
 
-### Docker Production
+## Environment Variables
 
-```bash
-# Start production build
-docker-compose --profile production up frontend-prod
-
-# Or build and run manually
-docker build -t trading-frontend --target production .
-docker run -p 3000:80 trading-frontend
+```env
+VITE_API_BASE_URL=http://localhost:8000/api/v1
+VITE_NODE_ENV=development
+VITE_ENABLE_DEVTOOLS=true
 ```
 
 ## Project Structure
@@ -62,114 +105,90 @@ docker run -p 3000:80 trading-frontend
 ```
 src/
 ├── components/          # React components
-│   ├── CryptocurrencyCard.tsx
-│   └── CryptocurrencyDashboard.tsx
-├── services/           # API services
-│   └── api.ts
+│   ├── Auth/           # Authentication components
+│   ├── Layout/         # Layout and navigation
+│   ├── Trading/        # Trading interface
+│   ├── Portfolio/      # Portfolio management
+│   └── Risk/           # Risk analysis
+├── contexts/           # React contexts
+├── services/           # API service layers
 ├── types/              # TypeScript type definitions
-│   └── cryptocurrency.ts
-├── lib/                # Utility functions
-│   └── utils.ts
-├── App.tsx             # Main application component
-└── main.tsx           # Application entry point
+└── lib/                # Utility functions
 ```
 
-## API Integration
+## Key Components
 
-The frontend integrates with the backend API endpoints:
+### Authentication Flow
+- `LoginForm` - User login interface
+- `RegisterForm` - User registration
+- `AuthContext` - Authentication state management
 
-- `GET /api/v1/cryptocurrencies/` - List cryptocurrencies with filtering
-- `GET /api/v1/cryptocurrencies/{symbol}` - Get specific cryptocurrency
-- `GET /api/v1/cryptocurrencies/{symbol}/history` - Get price history
-- `GET /api/v1/cryptocurrencies/top/{category}` - Get top cryptocurrencies
-- `POST /api/v1/cryptocurrencies/sync` - Sync data from external APIs
+### Trading Interface
+- `TradingDashboard` - Main trading interface
+- `TradingForm` - Buy/sell order placement
+- `WalletInfo` - Wallet balance and stats
+- `TransactionHistory` - Trade history table
 
-## Environment Variables
+### Portfolio Management
+- `PortfolioDashboard` - Portfolio overview
+- `HoldingsTable` - Current positions
+- `PortfolioChart` - Asset allocation visualization
+- `PortfolioSummary` - Performance metrics
 
-### Development (.env.development)
-```
-VITE_API_BASE_URL=http://localhost:8000/api/v1
-VITE_APP_NAME=Trading System
-VITE_APP_VERSION=1.0.0
-```
+### Risk Analysis
+- `RiskDashboard` - Risk overview
+- `RiskMetricsCard` - Risk scoring and metrics
+- `RiskAssessmentCard` - Detailed risk analysis
+- `RiskAlertsTable` - Active risk alerts
 
-### Production (.env.production)
-```
-VITE_API_BASE_URL=/api/v1
-VITE_APP_NAME=Trading System
-VITE_APP_VERSION=1.0.0
-```
+## Development
 
-## Features Implemented
+### Code Style
+- ESLint for code linting
+- TypeScript for type safety
+- Prettier for code formatting (recommended)
 
-### ✅ FRONTEND-001 - Application Setup & Configuration
+### State Management
+- React Query for server state
+- React Context for authentication
+- Local state with useState/useReducer
 
-- [x] React with TypeScript in strict mode
-- [x] Vite as bundler with fast builds and hot reloading
-- [x] TailwindCSS and shadcn/ui for consistent styling
-- [x] Docker and Docker Compose integration
-- [x] Production-optimized builds with code splitting
-- [x] Environment-based configuration
-
-### Dashboard Features
-
-- **Cryptocurrency Listing**: Display top cryptocurrencies with real-time data
-- **Search & Filter**: Search by symbol and sort by various metrics
-- **Real-time Updates**: Automatic refresh every 30 seconds
-- **Responsive Design**: Works on desktop and mobile devices
-- **Error Handling**: Graceful error handling with retry mechanisms
-- **Loading States**: Proper loading indicators and skeleton states
-
-## Available Scripts
-
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
-- `npm run type-check` - Run TypeScript type checking
-
-## Technology Stack
-
-- **React 19** - UI library
-- **TypeScript** - Type safety
-- **Vite** - Build tool and dev server
-- **TailwindCSS** - Utility-first CSS framework
-- **TanStack Query** - Data fetching and caching
-- **Axios** - HTTP client
-- **Lucide React** - Icon library
-- **Docker** - Containerization
-
-## Performance Optimizations
-
-- **Code Splitting**: Automatic vendor and feature-based chunks
-- **Lazy Loading**: Components loaded on demand
-- **Caching**: React Query handles API response caching
-- **Compression**: Gzip compression in production
-- **Asset Optimization**: Optimized images and static assets
-
-## Security Features
-
-- **Content Security Policy**: Configured in nginx
-- **XSS Protection**: Security headers in production
-- **CORS Handling**: Proper CORS configuration
-- **Environment Variables**: Secure configuration management
-
-## Next Steps
-
-The following tickets are ready for implementation:
-
-- **FRONTEND-002**: Authentication & Secure Access
-- **FRONTEND-003**: Dashboard: Market Analysis Visualization
-- **FRONTEND-004**: Dashboard: Risk Reporting
-- **FRONTEND-005**: Dashboard: Trade Monitoring & Moderation
-- **FRONTEND-006**: Real-Time Updates & Notifications
-- **FRONTEND-007**: State Management
-- **FRONTEND-008**: Logging & Error Handling
+### Styling
+- Tailwind CSS for utility-first styling
+- Responsive design for mobile/desktop
+- Consistent color scheme and spacing
 
 ## Contributing
 
-1. Follow the existing code style and TypeScript conventions
-2. Add proper type definitions for new features
-3. Include error handling and loading states
-4. Test responsive design on multiple screen sizes
-5. Update documentation for new features
+1. Follow the existing code structure
+2. Use TypeScript for all new components
+3. Add proper error handling
+4. Include loading states for async operations
+5. Ensure responsive design
+6. Test with the backend API
+
+## Troubleshooting
+
+### Common Issues
+
+1. **API Connection Failed**
+   - Ensure backend is running on port 8000
+   - Check VITE_API_BASE_URL in .env file
+   - Verify CORS settings in backend
+
+2. **Authentication Issues**
+   - Clear localStorage and try again
+   - Check token expiration
+   - Verify backend auth endpoints
+
+3. **Build Errors**
+   - Run `npm install` to update dependencies
+   - Check TypeScript errors
+   - Ensure all imports are correct
+
+### Development Tips
+
+- Use React DevTools for debugging
+- Enable React Query DevTools in development
+- Check browser console for errors
+- Use network tab to debug API calls
