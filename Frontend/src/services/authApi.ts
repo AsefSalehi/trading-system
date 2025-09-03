@@ -55,8 +55,27 @@ export const authApi = {
 
   // Public user registration
   register: async (userData: RegisterRequest): Promise<Token> => {
-    const response = await api.post('/auth/register', userData);
-    return response.data;
+    console.log('🔍 authApi: register called with data:', userData);
+    console.log('🔍 authApi: making POST request to /auth/register');
+    
+    try {
+      const response = await api.post('/auth/register', userData);
+      console.log('✅ authApi: registration response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('❌ authApi: registration failed:', error);
+      
+      // Type guard for axios error
+      const isAxiosError = (err: unknown): err is { response?: { data: any; status: number } } => {
+        return typeof err === 'object' && err !== null && 'response' in err;
+      };
+      
+      if (isAxiosError(error)) {
+        console.error('❌ authApi: error response:', error.response?.data);
+        console.error('❌ authApi: error status:', error.response?.status);
+      }
+      throw error;
+    }
   },
 
   // Token validation

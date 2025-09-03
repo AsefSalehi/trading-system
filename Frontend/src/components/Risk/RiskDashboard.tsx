@@ -10,7 +10,7 @@ export const RiskDashboard: React.FC = () => {
   const queryClient = useQueryClient();
 
   // Fetch risk dashboard data
-  const { data: dashboardData, isLoading: dashboardLoading } = useQuery({
+  const { isLoading: dashboardLoading } = useQuery({
     queryKey: ['risk-dashboard'],
     queryFn: () => riskApi.getRiskDashboard(),
     retry: false,

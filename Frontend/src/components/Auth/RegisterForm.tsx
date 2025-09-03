@@ -23,29 +23,65 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleMode }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('🔍 Form submission started');
+    console.log('📝 Form data:', formData);
+    
     setIsLoading(true);
     setError('');
 
+    // Validate required fields
+    if (!formData.email || !formData.username || !formData.password) {
+      const error = 'Please fill in all required fields';
+      console.error('❌ Validation error:', error);
+      setError(error);
+      setIsLoading(false);
+      return;
+    }
+
     if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
+      const error = 'Passwords do not match';
+      console.error('❌ Password mismatch:', error);
+      setError(error);
       setIsLoading(false);
       return;
     }
 
     try {
       const { confirmPassword, ...registerData } = formData;
+      console.log('🚀 Calling register function with data:', registerData);
+      
+      // Check if register function exists
+      if (typeof register !== 'function') {
+        throw new Error('Register function is not available');
+      }
+      
       await register(registerData);
+      console.log('✅ Registration successful!');
     } catch (error: any) {
-      setError(error.response?.data?.detail || 'Registration failed. Please try again.');
+      console.error('❌ Registration failed:', error);
+      console.error('❌ Error details:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status
+      });
+      setError(error.response?.data?.detail || error.message || 'Registration failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    console.log(`📝 Field changed: ${name} = "${value}"`);
+    
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [name]: value,
+    });
+    
+    console.log('📝 Updated form data:', {
+      ...formData,
+      [name]: value,
     });
   };
 
@@ -318,6 +354,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onToggleMode }) => {
                 <button
                   type="submit"
                   disabled={isLoading}
+                  onClick={() => console.log('💆 Register button clicked!')}
                   className="group relative w-full bg-gradient-to-r from-emerald-600 to-blue-600 hover:from-emerald-700 hover:to-blue-700 text-white font-semibold py-4 px-6 rounded-2xl transition-all duration-200 transform hover:scale-[1.02] hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none mt-6"
                 >
                   <span className="flex items-center justify-center space-x-2">

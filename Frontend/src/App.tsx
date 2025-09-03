@@ -5,7 +5,7 @@ import { MainLayout } from './components/Layout/MainLayout';
 import { LoginForm } from './components/Auth/LoginForm';
 import { RegisterForm } from './components/Auth/RegisterForm';
 import { ToastContainer } from './components/Toast/ToastContainer';
-import { DebugHelper } from './components/DebugHelper';
+
 import { useToast } from './hooks/useToast';
 
 // Create a client
@@ -36,10 +36,15 @@ const AuthenticatedApp: React.FC = () => {
   }
 
   if (!isAuthenticated) {
-    return isLoginMode ? (
-      <LoginForm onToggleMode={() => setIsLoginMode(false)} />
-    ) : (
-      <RegisterForm onToggleMode={() => setIsLoginMode(true)} />
+    return (
+      <div>
+        {isLoginMode ? (
+          <LoginForm onToggleMode={() => setIsLoginMode(false)} />
+        ) : (
+          <RegisterForm onToggleMode={() => setIsLoginMode(true)} />
+        )}
+
+      </div>
     );
   }
 
@@ -53,7 +58,7 @@ const AppWithToast: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <AuthenticatedApp />
       <ToastContainer toasts={toasts} onClose={removeToast} />
-      <DebugHelper />
+
     </div>
   );
 };

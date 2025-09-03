@@ -10,6 +10,14 @@ const api = axios.create({
   },
 });
 
+// Debug: Log the base URL being used
+console.log('🔧 API Configuration:');
+console.log('- Base URL:', import.meta.env.VITE_API_BASE_URL || '/api/v1');
+console.log('- Environment variables:', {
+  VITE_API_BASE_URL: import.meta.env.VITE_API_BASE_URL,
+  VITE_DEV_MODE: import.meta.env.VITE_DEV_MODE
+});
+
 // Request interceptor for adding auth tokens if needed
 api.interceptors.request.use(
   (config) => {

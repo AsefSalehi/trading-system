@@ -74,15 +74,40 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   };
 
   const register = async (userData: RegisterRequest) => {
+    console.log('🔍 AuthContext: register function called');
+    console.log('📝 AuthContext: userData received:', userData);
+    
     try {
+      console.log('🚀 AuthContext: calling authApi.register');
       const tokenResponse = await authApi.register(userData);
+      console.log('✅ AuthContext: token received:', tokenResponse);
+      
       localStorage.setItem('auth_token', tokenResponse.access_token);
+      console.log('💾 AuthContext: token stored in localStorage');
 
       // Get user data after successful registration
+      console.log('🚀 AuthContext: fetching current user data');
       const userDataResponse = await authApi.getCurrentUser();
+      console.log('✅ AuthContext: user data received:', userDataResponse);
+      
       setUser(userDataResponse);
+      console.log('✅ AuthContext: registration completed successfully');
     } catch (error) {
-      console.error('Registration failed:', error);
+      console.error('❌ AuthContext: registration failed:', error);
+      
+      // Type guard for axios error
+      const isAxiosError = (err: unknown): err is { message: string; response?: { data: any; status: number }; config?: any } => {
+        return typeof err === 'object' && err !== null && 'message' in err;
+      };
+      
+      if (isAxiosError(error)) {
+        console.error('❌ AuthContext: error details:', {
+          message: error.message,
+          response: error.response?.data,
+          status: error.response?.status,
+          config: error.config
+        });
+      }
       throw error;
     }
   };
