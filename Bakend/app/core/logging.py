@@ -14,7 +14,7 @@ correlation_id: ContextVar[Optional[str]] = ContextVar('correlation_id', default
 
 class JSONFormatter(logging.Formatter):
     """Custom JSON formatter for structured logging"""
-    
+
     def format(self, record: logging.LogRecord) -> str:
         log_entry = {
             "timestamp": datetime.utcnow().isoformat() + "Z",
@@ -25,30 +25,30 @@ class JSONFormatter(logging.Formatter):
             "function": record.funcName,
             "line": record.lineno,
         }
-        
+
         # Add correlation ID if available
         corr_id = correlation_id.get()
         if corr_id:
             log_entry["correlation_id"] = corr_id
-            
+
         # Add extra fields
         if hasattr(record, 'extra') and record.extra:
             log_entry.update(record.extra)
-            
+
         # Add exception info if present
         if record.exc_info:
             log_entry["exception"] = self.formatException(record.exc_info)
-            
+
         return json.dumps(log_entry)
 
 
 class CorrelationIdFilter(logging.Filter):
     """Filter to add correlation ID to log records"""
-    
+
     def filter(self, record: logging.LogRecord) -> bool:
         corr_id = correlation_id.get()
-        if corr_id:
-            record.correlation_id = corr_id
+        # Always set correlation_id to avoid KeyError in formatter
+        record.correlation_id = corr_id if corr_id else "none"
         return True
 
 
@@ -65,11 +65,12 @@ class Logger:
         if settings.ENVIRONMENT == "production":
             formatter = JSONFormatter()
         else:
+            # Simple formatter without correlation_id to avoid KeyError
             formatter = logging.Formatter(
-                fmt="%(asctime)s - %(name)s - %(levelname)s - %(correlation_id)s - %(message)s",
+                fmt="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
                 datefmt="%Y-%m-%d %H:%M:%S",
             )
-        
+
         console_handler.setFormatter(formatter)
         console_handler.addFilter(CorrelationIdFilter())
 
@@ -108,16 +109,16 @@ class Logger:
         """Internal logging method"""
         log_extra = extra or {}
         log_extra.update(kwargs)
-        
+
         # Create a custom LogRecord to include extra data
         record = self.logger.makeRecord(
             self.logger.name, level, "", 0, message, (), None
         )
         record.extra = log_extra
-        
+
         self.logger.handle(record)
 
-    def log_api_request(self, method: str, path: str, status_code: int, 
+    def log_api_request(self, method: str, path: str, status_code: int,
                        duration_ms: float, user_id: Optional[int] = None):
         """Log API request with structured data"""
         self.info(

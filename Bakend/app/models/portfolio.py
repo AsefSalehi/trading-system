@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, String, Float, DateTime, ForeignKey, Boo
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
-from app.db.base_class import Base
+from app.db.database import Base
 
 
 class Portfolio(Base):
@@ -66,29 +66,6 @@ class PortfolioRiskAnalysis(Base):
     # Relationships
     portfolio = relationship("Portfolio", back_populates="risk_analyses")
 
-
-class RiskAlert(Base):
-    """Risk alerts for portfolios and individual assets"""
-    __tablename__ = "risk_alerts"
-
-    id = Column(Integer, primary_key=True, index=True)
-    portfolio_id = Column(Integer, ForeignKey("portfolios.id"), nullable=True)
-    cryptocurrency_id = Column(Integer, ForeignKey("cryptocurrencies.id"), nullable=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
-    alert_type = Column(String(50), nullable=False)  # 'volatility', 'concentration', 'loss_threshold'
-    severity = Column(String(20), nullable=False)  # 'low', 'medium', 'high', 'critical'
-    title = Column(String(255), nullable=False)
-    message = Column(Text, nullable=False)
-    threshold_value = Column(Float, nullable=True)
-    current_value = Column(Float, nullable=True)
-    is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    resolved_at = Column(DateTime(timezone=True), nullable=True)
-
-    # Relationships
-    portfolio = relationship("Portfolio")
-    cryptocurrency = relationship("Cryptocurrency")
-    user = relationship("User")
 
 
 class RebalanceRecommendation(Base):

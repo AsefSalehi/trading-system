@@ -1,6 +1,6 @@
 from typing import List, Optional
 from datetime import datetime
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status, Request
 from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 from slowapi import Limiter, _rate_limit_exceeded_handler
@@ -31,7 +31,7 @@ limiter = Limiter(key_func=get_remote_address)
 )
 @limiter.limit(f"{settings.RATE_LIMIT_PER_MINUTE}/minute")
 async def list_cryptocurrencies(
-    request,  # Required for rate limiting
+    request: Request,  # Required for rate limiting
     skip: int = Query(0, ge=0, description="Number of records to skip"),
     limit: int = Query(
         100, ge=1, le=1000, description="Maximum number of records to return"
@@ -108,7 +108,7 @@ async def list_cryptocurrencies(
 )
 @limiter.limit(f"{settings.RATE_LIMIT_PER_MINUTE}/minute")
 async def get_cryptocurrency(
-    request,  # Required for rate limiting
+    request: Request,  # Required for rate limiting
     symbol: str,
     db: AsyncSession = Depends(get_db),
 ):
@@ -148,7 +148,7 @@ async def get_cryptocurrency(
 )
 @limiter.limit(f"{settings.RATE_LIMIT_PER_MINUTE}/minute")
 async def get_price_history(
-    request,  # Required for rate limiting
+    request: Request,  # Required for rate limiting
     symbol: str,
     start_date: Optional[datetime] = Query(
         None, description="Start date for price history"
@@ -206,7 +206,7 @@ async def get_price_history(
 )
 @limiter.limit("10/minute")  # More restrictive for data sync
 async def sync_cryptocurrency_data(
-    request,  # Required for rate limiting
+    request: Request,  # Required for rate limiting
     limit: int = Query(
         100, ge=1, le=1000, description="Number of cryptocurrencies to sync"
     ),
@@ -260,7 +260,7 @@ async def sync_cryptocurrency_data(
 )
 @limiter.limit(f"{settings.RATE_LIMIT_PER_MINUTE}/minute")
 async def get_top_cryptocurrencies(
-    request,  # Required for rate limiting
+    request: Request,  # Required for rate limiting
     category: str,
     limit: int = Query(
         10, ge=1, le=100, description="Number of top cryptocurrencies to return"

@@ -3,17 +3,29 @@ from typing import Optional, Union
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from fastapi import HTTPException, status
+import warnings
 
 from app.core.config import settings
 
+# Suppress bcrypt version warnings
+warnings.filterwarnings("ignore", message=".*bcrypt.*", category=UserWarning)
+
 
 # Password hashing with robust bcrypt configuration
-pwd_context = CryptContext(
-    schemes=["bcrypt"],
-    deprecated="auto",
-    bcrypt__rounds=12,  # Strong security rounds
-    bcrypt__ident="2b"  # Use 2b variant for compatibility
-)
+# Handle bcrypt version compatibility issues
+try:
+    pwd_context = CryptContext(
+        schemes=["bcrypt"],
+        deprecated="auto",
+        bcrypt__rounds=12,  # Strong security rounds
+        bcrypt__ident="2b"  # Use 2b variant for compatibility
+    )
+except Exception:
+    # Fallback configuration if bcrypt version detection fails
+    pwd_context = CryptContext(
+        schemes=["bcrypt"],
+        deprecated="auto"
+    )
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:

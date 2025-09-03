@@ -74,7 +74,7 @@ class MetricsCollector:
             endpoint=endpoint,
             status_code=str(status_code)
         ).inc()
-        
+
         REQUEST_DURATION.labels(
             method=method,
             endpoint=endpoint
@@ -87,7 +87,7 @@ class MetricsCollector:
             job_name=job_name,
             status=status
         ).inc()
-        
+
         if duration is not None:
             BACKGROUND_JOB_DURATION.labels(job_name=job_name).observe(duration)
 
@@ -98,7 +98,7 @@ class MetricsCollector:
             operation=operation,
             table=table
         ).inc()
-        
+
         DATABASE_OPERATION_DURATION.labels(
             operation=operation,
             table=table
@@ -141,13 +141,27 @@ def get_metrics() -> Response:
 
 def get_health_metrics() -> Dict[str, Any]:
     """Get application health metrics"""
+    try:
+        # Get metric values safely
+        total_requests = sum(REQUEST_COUNT._value.values()) if hasattr(REQUEST_COUNT, '_value') else 0
+        active_connections = ACTIVE_CONNECTIONS._value.get() if hasattr(ACTIVE_CONNECTIONS, '_value') else 0
+        total_background_jobs = sum(BACKGROUND_JOBS_TOTAL._value.values()) if hasattr(BACKGROUND_JOBS_TOTAL, '_value') else 0
+        total_risk_assessments = RISK_ASSESSMENTS_TOTAL._value.get() if hasattr(RISK_ASSESSMENTS_TOTAL, '_value') else 0
+    except Exception:
+        # Fallback values if metrics access fails
+        total_requests = 0
+        active_connections = 0
+        total_background_jobs = 0
+        total_risk_assessments = 0
+
     return {
         "status": "healthy",
         "timestamp": time.time(),
+        "version": "1.0.0",
         "metrics": {
-            "total_requests": REQUEST_COUNT._value.sum(),
-            "active_connections": ACTIVE_CONNECTIONS._value.get(),
-            "total_background_jobs": BACKGROUND_JOBS_TOTAL._value.sum(),
-            "total_risk_assessments": RISK_ASSESSMENTS_TOTAL._value.get(),
+            "total_requests": total_requests,
+            "active_connections": active_connections,
+            "total_background_jobs": total_background_jobs,
+            "total_risk_assessments": total_risk_assessments,
         }
     }
