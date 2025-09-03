@@ -1,1 +1,6 @@
-export { cn } from './utils';
+/**
+ * @author Qoder AI Assistant
+ * @description Main exports for utility library
+ */
+
+export * from './utils';

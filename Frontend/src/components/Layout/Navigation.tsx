@@ -63,19 +63,19 @@ export const Navigation: React.FC<NavigationProps> = ({
 
       {/* Sidebar */}
       <div className={`
-        fixed inset-y-0 left-0 z-40 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out
+        fixed inset-y-0 left-0 z-40 w-64 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out border-r border-gray-200
         ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
         lg:translate-x-0 lg:static lg:inset-0
       `}>
         <div className="flex flex-col h-full">
           {/* Header */}
-          <div className="flex items-center justify-center h-16 px-4 bg-blue-600 text-white">
+          <div className="flex items-center justify-center h-16 px-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white">
             <TrendingUp className="h-8 w-8 mr-2" />
             <h1 className="text-xl font-bold">Trading System</h1>
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 px-4 py-6 space-y-2">
+          <nav className="flex-1 px-4 py-6 space-y-1">
             {navigationItems.map((item) => {
               const Icon = item.icon;
               return (
@@ -86,10 +86,10 @@ export const Navigation: React.FC<NavigationProps> = ({
                     setIsMobileMenuOpen(false);
                   }}
                   className={`
-                    w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors
+                    w-full flex items-center px-4 py-3 text-left rounded-xl transition-all duration-200
                     ${currentView === item.id
-                      ? 'bg-blue-50 text-blue-700 border-l-4 border-blue-700'
-                      : 'text-gray-700 hover:bg-gray-50'
+                      ? 'bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 shadow-md border-l-4 border-blue-600 font-medium'
+                      : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
                     }
                   `}
                 >
@@ -101,10 +101,10 @@ export const Navigation: React.FC<NavigationProps> = ({
           </nav>
 
           {/* User section */}
-          <div className="border-t border-gray-200 p-4">
+          <div className="border-t border-gray-200 p-4 bg-gray-50">
             <div className="flex items-center mb-4">
               <div className="flex-shrink-0">
-                <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                <div className="h-10 w-10 rounded-full bg-gradient-to-r from-blue-100 to-blue-200 flex items-center justify-center ring-2 ring-blue-100">
                   <User className="h-6 w-6 text-blue-600" />
                 </div>
               </div>
@@ -112,12 +112,12 @@ export const Navigation: React.FC<NavigationProps> = ({
                 <p className="text-sm font-medium text-gray-900">
                   {user?.full_name || user?.username}
                 </p>
-                <p className="text-xs text-gray-500">{user?.role}</p>
+                <p className="text-xs text-gray-500 capitalize">{user?.role}</p>
               </div>
             </div>
             <button
               onClick={handleLogout}
-              className="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+              className="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-red-50 hover:text-red-700 rounded-xl transition-all duration-200 font-medium"
             >
               <LogOut className="h-4 w-4 mr-3" />
               Sign out

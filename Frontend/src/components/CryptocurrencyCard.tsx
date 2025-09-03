@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Cryptocurrency } from '../types/cryptocurrency';
-import { cn } from '../lib';
+import { cn, formatCurrency, formatLargeNumber, formatPercentage, getValueColor } from '../lib/utils';
 
 interface CryptocurrencyCardProps {
   cryptocurrency: Cryptocurrency;
@@ -11,33 +11,11 @@ export const CryptocurrencyCard: React.FC<CryptocurrencyCardProps> = ({
   cryptocurrency,
   className
 }) => {
-  const priceChangeColor = cryptocurrency.price_change_percentage_24h >= 0
-    ? 'text-green-600'
-    : 'text-red-600';
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 6,
-    }).format(price);
-  };
-
-  const formatMarketCap = (marketCap: number) => {
-    if (marketCap >= 1e12) {
-      return `$${(marketCap / 1e12).toFixed(2)}T`;
-    } else if (marketCap >= 1e9) {
-      return `$${(marketCap / 1e9).toFixed(2)}B`;
-    } else if (marketCap >= 1e6) {
-      return `$${(marketCap / 1e6).toFixed(2)}M`;
-    }
-    return `$${marketCap.toLocaleString()}`;
-  };
+  const priceChangeColor = getValueColor(cryptocurrency.price_change_percentage_24h);
 
   return (
     <div className={cn(
-      "bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow duration-200",
+      "bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-blue-200",
       className
     )}>
       <div className="flex items-center justify-between mb-4">
@@ -46,51 +24,50 @@ export const CryptocurrencyCard: React.FC<CryptocurrencyCardProps> = ({
             <img
               src={cryptocurrency.image}
               alt={cryptocurrency.name}
-              className="w-8 h-8 rounded-full"
+              className="w-10 h-10 rounded-full ring-2 ring-gray-100"
             />
           )}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900">
+            <h3 className="text-lg font-bold text-gray-900 leading-tight">
               {cryptocurrency.name}
             </h3>
-            <p className="text-sm text-gray-500 uppercase">
+            <p className="text-sm font-medium text-gray-500 uppercase tracking-wide">
               {cryptocurrency.symbol}
             </p>
           </div>
         </div>
         <div className="text-right">
-          <p className="text-lg font-bold text-gray-900">
-            {formatPrice(cryptocurrency.current_price)}
+          <p className="text-xl font-bold text-gray-900">
+            {formatCurrency(cryptocurrency.current_price)}
           </p>
-          <p className={cn("text-sm font-medium", priceChangeColor)}>
-            {cryptocurrency.price_change_percentage_24h >= 0 ? '+' : ''}
-            {cryptocurrency.price_change_percentage_24h.toFixed(2)}%
+          <p className={cn("text-sm font-bold", priceChangeColor)}>
+            {formatPercentage(cryptocurrency.price_change_percentage_24h)}
           </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 text-sm">
-        <div>
-          <p className="text-gray-500">Market Cap</p>
-          <p className="font-semibold text-gray-900">
-            {formatMarketCap(cryptocurrency.market_cap)}
+      <div className="grid grid-cols-2 gap-6 text-sm mt-6 pt-4 border-t border-gray-100">
+        <div className="space-y-1">
+          <p className="text-gray-500 font-medium">Market Cap</p>
+          <p className="font-bold text-gray-900 text-base">
+            {formatLargeNumber(cryptocurrency.market_cap)}
           </p>
         </div>
-        <div>
-          <p className="text-gray-500">Rank</p>
-          <p className="font-semibold text-gray-900">
+        <div className="space-y-1">
+          <p className="text-gray-500 font-medium">Rank</p>
+          <p className="font-bold text-gray-900 text-base">
             #{cryptocurrency.market_cap_rank}
           </p>
         </div>
-        <div>
-          <p className="text-gray-500">Volume (24h)</p>
-          <p className="font-semibold text-gray-900">
-            {formatMarketCap(cryptocurrency.total_volume)}
+        <div className="space-y-1">
+          <p className="text-gray-500 font-medium">Volume (24h)</p>
+          <p className="font-bold text-gray-900 text-base">
+            {formatLargeNumber(cryptocurrency.total_volume)}
           </p>
         </div>
-        <div>
-          <p className="text-gray-500">Last Updated</p>
-          <p className="font-semibold text-gray-900">
+        <div className="space-y-1">
+          <p className="text-gray-500 font-medium">Last Updated</p>
+          <p className="font-bold text-gray-900 text-base">
             {new Date(cryptocurrency.last_updated).toLocaleDateString()}
           </p>
         </div>

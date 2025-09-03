@@ -10,6 +10,7 @@ interface AuthContextType {
   register: (userData: RegisterRequest) => Promise<void>;
   logout: () => Promise<void>;
   updateUser: (userData: Partial<User>) => Promise<void>;
+  forceLogout: () => void; // Development helper
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -53,7 +54,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsLoading(false);
     };
 
-    initializeAuth();
+    // Add a small delay to ensure smooth loading experience
+    const timer = setTimeout(initializeAuth, 100);
+    return () => clearTimeout(timer);
   }, []);
 
   const login = async (credentials: LoginRequest) => {
@@ -99,6 +102,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const forceLogout = () => {
+    localStorage.removeItem('auth_token');
+    setUser(null);
+    console.log('Authentication cleared for testing');
+  };
+
   const value: AuthContextType = {
     user,
     isLoading,
@@ -107,7 +116,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     register,
     logout,
     updateUser,
+    forceLogout,
   };
+
+  // Development helper: expose forceLogout globally
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as any).forceLogout = forceLogout;
+      console.log('Development helper: Use window.forceLogout() to test login forms');
+    }
+  }, []);
 
   return (
     <AuthContext.Provider value={value}>
