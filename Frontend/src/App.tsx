@@ -4,6 +4,8 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { MainLayout } from './components/Layout/MainLayout';
 import { LoginForm } from './components/Auth/LoginForm';
 import { RegisterForm } from './components/Auth/RegisterForm';
+import { ToastContainer } from './components/Toast/ToastContainer';
+import { useToast } from './hooks/useToast';
 
 // Create a client
 const queryClient = new QueryClient({
@@ -43,13 +45,22 @@ const AuthenticatedApp: React.FC = () => {
   return <MainLayout />;
 };
 
+const AppWithToast: React.FC = () => {
+  const { toasts, removeToast } = useToast();
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+      <AuthenticatedApp />
+      <ToastContainer toasts={toasts} onClose={removeToast} />
+    </div>
+  );
+};
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-          <AuthenticatedApp />
-        </div>
+        <AppWithToast />
       </AuthProvider>
     </QueryClientProvider>
   );
