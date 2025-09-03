@@ -9,54 +9,33 @@ import { Shield, RefreshCw, AlertTriangle } from 'lucide-react';
 export const RiskDashboard: React.FC = () => {
   const queryClient = useQueryClient();
 
-  // Fetch risk assessment
-  const { data: riskAssessment, isLoading: assessmentLoading } = useQuery({
-    queryKey: ['risk-assessment'],
-    queryFn: () => riskApi.getRiskAssessment(),
-    retry: false,
-  });
-
-  // Fetch risk metrics
-  const { data: riskMetrics, isLoading: metricsLoading } = useQuery({
-    queryKey: ['risk-metrics'],
-    queryFn: () => riskApi.getRiskMetrics(),
+  // Fetch risk dashboard data
+  const { data: dashboardData, isLoading: dashboardLoading } = useQuery({
+    queryKey: ['risk-dashboard'],
+    queryFn: () => riskApi.getRiskDashboard(),
     retry: false,
   });
 
   // Fetch risk alerts
   const { data: riskAlerts } = useQuery({
     queryKey: ['risk-alerts'],
-    queryFn: () => riskApi.getRiskAlerts({ limit: 20 }),
+    queryFn: () => riskApi.getRiskAlerts({}),
   });
 
-  // Create risk assessment mutation
-  const createAssessmentMutation = useMutation({
-    mutationFn: () => riskApi.createRiskAssessment(),
+  // Refresh dashboard mutation
+  const refreshMutation = useMutation({
+    mutationFn: () => riskApi.getRiskDashboard(),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['risk-assessment'] });
-      queryClient.invalidateQueries({ queryKey: ['risk-metrics'] });
-    },
-  });
-
-  // Analyze portfolio risk mutation
-  const analyzeRiskMutation = useMutation({
-    mutationFn: () => riskApi.analyzePortfolioRisk(),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['risk-assessment'] });
-      queryClient.invalidateQueries({ queryKey: ['risk-metrics'] });
+      queryClient.invalidateQueries({ queryKey: ['risk-dashboard'] });
       queryClient.invalidateQueries({ queryKey: ['risk-alerts'] });
     },
   });
 
-  const handleCreateAssessment = () => {
-    createAssessmentMutation.mutate();
+  const handleRefresh = () => {
+    refreshMutation.mutate();
   };
 
-  const handleAnalyzeRisk = () => {
-    analyzeRiskMutation.mutate();
-  };
-
-  const isLoading = assessmentLoading || metricsLoading;
+  const isLoading = dashboardLoading;
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
@@ -68,23 +47,13 @@ export const RiskDashboard: React.FC = () => {
         </div>
         <div className="flex space-x-3">
           <button
-            onClick={handleAnalyzeRisk}
-            disabled={analyzeRiskMutation.isPending}
+            onClick={handleRefresh}
+            disabled={refreshMutation.isPending}
             className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
           >
-            <RefreshCw className={`h-4 w-4 mr-2 ${analyzeRiskMutation.isPending ? 'animate-spin' : ''}`} />
-            Analyze Portfolio Risk
+            <RefreshCw className={`h-4 w-4 mr-2 ${refreshMutation.isPending ? 'animate-spin' : ''}`} />
+            Refresh Data
           </button>
-          {!riskAssessment && (
-            <button
-              onClick={handleCreateAssessment}
-              disabled={createAssessmentMutation.isPending}
-              className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-            >
-              <Shield className="h-4 w-4 mr-2" />
-              {createAssessmentMutation.isPending ? 'Creating...' : 'Create Assessment'}
-            </button>
-          )}
         </div>
       </div>
 

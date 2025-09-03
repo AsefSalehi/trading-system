@@ -12,21 +12,22 @@ export const RiskAlertsTable: React.FC<RiskAlertsTableProps> = ({ alerts }) => {
   const queryClient = useQueryClient();
 
   const acknowledgeMutation = useMutation({
-    mutationFn: (alertId: string) => riskApi.acknowledgeAlert(alertId),
+    mutationFn: (alertId: number) => riskApi.resolveRiskAlert(alertId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['risk-alerts'] });
     },
   });
 
   const getSeverityColor = (severity: string) => {
-    switch (severity) {
-      case 'LOW':
+    const normalizedSeverity = severity.toLowerCase();
+    switch (normalizedSeverity) {
+      case 'low':
         return 'text-blue-600 bg-blue-50';
-      case 'MEDIUM':
+      case 'medium':
         return 'text-yellow-600 bg-yellow-50';
-      case 'HIGH':
+      case 'high':
         return 'text-orange-600 bg-orange-50';
-      case 'CRITICAL':
+      case 'critical':
         return 'text-red-600 bg-red-50';
       default:
         return 'text-gray-600 bg-gray-50';
@@ -34,13 +35,14 @@ export const RiskAlertsTable: React.FC<RiskAlertsTableProps> = ({ alerts }) => {
   };
 
   const getSeverityIcon = (severity: string) => {
-    switch (severity) {
-      case 'LOW':
+    const normalizedSeverity = severity.toLowerCase();
+    switch (normalizedSeverity) {
+      case 'low':
         return <Shield className="h-4 w-4" />;
-      case 'MEDIUM':
+      case 'medium':
         return <Clock className="h-4 w-4" />;
-      case 'HIGH':
-      case 'CRITICAL':
+      case 'high':
+      case 'critical':
         return <AlertTriangle className="h-4 w-4" />;
       default:
         return <Shield className="h-4 w-4" />;
@@ -66,7 +68,7 @@ export const RiskAlertsTable: React.FC<RiskAlertsTableProps> = ({ alerts }) => {
     return new Date(dateString).toLocaleString();
   };
 
-  const handleAcknowledge = (alertId: string) => {
+  const handleAcknowledge = (alertId: number) => {
     acknowledgeMutation.mutate(alertId);
   };
 
@@ -80,7 +82,7 @@ export const RiskAlertsTable: React.FC<RiskAlertsTableProps> = ({ alerts }) => {
         <AlertTriangle className="h-6 w-6 text-orange-600 mr-2" />
         <h2 className="text-xl font-semibold text-gray-900">Risk Alerts</h2>
         <span className="ml-2 text-sm text-gray-500">
-          ({alerts.filter(alert => !alert.acknowledged).length} unacknowledged)
+          ({alerts.filter(alert => alert.is_active).length} active)
         </span>
       </div>
 
@@ -110,9 +112,9 @@ export const RiskAlertsTable: React.FC<RiskAlertsTableProps> = ({ alerts }) => {
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {alerts.map((alert) => (
-              <tr 
-                key={alert.id} 
-                className={`hover:bg-gray-50 ${!alert.acknowledged ? 'bg-yellow-50' : ''}`}
+              <tr
+                key={alert.id}
+                className={`hover:bg-gray-50 ${alert.is_active ? 'bg-yellow-50' : ''}`}
               >
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                   {getAlertTypeLabel(alert.alert_type)}
@@ -129,29 +131,29 @@ export const RiskAlertsTable: React.FC<RiskAlertsTableProps> = ({ alerts }) => {
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {formatDate(alert.triggered_at)}
+                  {formatDate(alert.created_at)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  {alert.acknowledged ? (
+                  {!alert.is_active ? (
                     <div className="inline-flex items-center text-green-600">
                       <CheckCircle className="h-4 w-4 mr-1" />
-                      <span className="text-xs">Acknowledged</span>
+                      <span className="text-xs">Resolved</span>
                     </div>
                   ) : (
                     <div className="inline-flex items-center text-orange-600">
                       <Clock className="h-4 w-4 mr-1" />
-                      <span className="text-xs">Pending</span>
+                      <span className="text-xs">Active</span>
                     </div>
                   )}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                  {!alert.acknowledged && (
+                  {alert.is_active && (
                     <button
                       onClick={() => handleAcknowledge(alert.id)}
                       disabled={acknowledgeMutation.isPending}
                       className="text-blue-600 hover:text-blue-900 disabled:opacity-50"
                     >
-                      Acknowledge
+                      Resolve
                     </button>
                   )}
                 </td>
@@ -169,21 +171,21 @@ export const RiskAlertsTable: React.FC<RiskAlertsTableProps> = ({ alerts }) => {
             <span className="font-semibold">{alerts.length}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-600">Unacknowledged:</span>
+            <span className="text-gray-600">Active:</span>
             <span className="font-semibold text-orange-600">
-              {alerts.filter(alert => !alert.acknowledged).length}
+              {alerts.filter(alert => alert.is_active).length}
             </span>
           </div>
           <div className="flex justify-between">
             <span className="text-gray-600">Critical:</span>
             <span className="font-semibold text-red-600">
-              {alerts.filter(alert => alert.severity === 'CRITICAL').length}
+              {alerts.filter(alert => alert.severity.toLowerCase() === 'critical').length}
             </span>
           </div>
           <div className="flex justify-between">
             <span className="text-gray-600">High:</span>
             <span className="font-semibold text-orange-600">
-              {alerts.filter(alert => alert.severity === 'HIGH').length}
+              {alerts.filter(alert => alert.severity.toLowerCase() === 'high').length}
             </span>
           </div>
         </div>
