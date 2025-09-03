@@ -4,6 +4,9 @@ FROM python:3.12-slim
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONPATH=/app
+ENV PIP_DEFAULT_TIMEOUT=100
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1
+ENV PIP_NO_CACHE_DIR=1
 
 # Set work directory
 WORKDIR /app
@@ -15,11 +18,15 @@ RUN apt-get update \
         gcc \
         python3-dev \
         libpq-dev \
+        curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Upgrade pip and install wheel
+RUN pip install --upgrade pip setuptools wheel
+
+# Install Python dependencies with increased timeout and retries
+COPY requirements-docker.txt .
+RUN pip install --timeout=1000 --retries=5 -r requirements-docker.txt
 
 # Copy project
 COPY . .
