@@ -61,9 +61,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (credentials: LoginRequest) => {
     try {
-      const response = await authApi.login(credentials);
-      localStorage.setItem('auth_token', response.access_token);
-      setUser(response.user);
+      const tokenResponse = await authApi.login(credentials);
+      localStorage.setItem('auth_token', tokenResponse.access_token);
+
+      // Get user data after successful login
+      const userData = await authApi.getCurrentUser();
+      setUser(userData);
     } catch (error) {
       console.error('Login failed:', error);
       throw error;
@@ -72,9 +75,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const register = async (userData: RegisterRequest) => {
     try {
-      const response = await authApi.register(userData);
-      localStorage.setItem('auth_token', response.access_token);
-      setUser(response.user);
+      // Note: Backend doesn't have public registration endpoint
+      // This would need to be implemented or handled differently
+      throw new Error('Public registration not available. Please contact administrator.');
     } catch (error) {
       console.error('Registration failed:', error);
       throw error;
@@ -94,7 +97,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const updateUser = async (userData: Partial<User>) => {
     try {
-      const updatedUser = await authApi.updateProfile(userData);
+      // Use userApi for profile updates since authApi doesn't have this endpoint
+      const { userApi } = await import('../services/userApi');
+      const updatedUser = await userApi.updateCurrentUserProfile(userData);
       setUser(updatedUser);
     } catch (error) {
       console.error('Failed to update user:', error);

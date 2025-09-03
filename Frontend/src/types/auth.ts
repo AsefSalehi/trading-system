@@ -3,7 +3,7 @@ export interface User {
   email: string;
   username: string;
   full_name?: string;
-  role: 'ADMIN' | 'TRADER' | 'VIEWER';
+  role: 'ADMIN' | 'ANALYST' | 'TRADER' | 'VIEWER';
   is_active: boolean;
   created_at: string;
   last_login?: string;
@@ -30,4 +30,5 @@ export interface AuthResponse {
 export interface TokenData {
   access_token: string;
   token_type: string;
+  expires_in: number;
 }

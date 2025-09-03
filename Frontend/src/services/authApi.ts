@@ -6,9 +6,25 @@ import type {
   AuthResponse 
 } from '../types/auth';
 
+export interface Token {
+  access_token: string;
+  token_type: string;
+  expires_in: number;
+}
+
 export const authApi = {
-  // Authentication
-  login: async (credentials: LoginRequest): Promise<AuthResponse> => {
+  // Authentication - Using correct backend endpoints
+  login: async (credentials: LoginRequest): Promise<Token> => {
+    // Backend expects JSON login via /auth/login/json
+    const response = await api.post('/auth/login/json', {
+      username: credentials.username,
+      password: credentials.password,
+    });
+    return response.data;
+  },
+
+  loginOAuth2: async (credentials: LoginRequest): Promise<Token> => {
+    // Alternative OAuth2 form-based login
     const formData = new FormData();
     formData.append('username', credentials.username);
     formData.append('password', credentials.password);
@@ -21,40 +37,35 @@ export const authApi = {
     return response.data;
   },
 
-  register: async (userData: RegisterRequest): Promise<AuthResponse> => {
-    const response = await api.post('/auth/register', userData);
+  refreshToken: async (): Promise<Token> => {
+    const response = await api.post('/auth/refresh');
     return response.data;
   },
 
-  logout: async (): Promise<void> => {
-    await api.post('/auth/logout');
+  logout: async (): Promise<{ message: string }> => {
+    const response = await api.post('/auth/logout');
     localStorage.removeItem('auth_token');
+    return response.data;
   },
 
-  // User profile
+  // User profile - Using correct endpoints
   getCurrentUser: async (): Promise<User> => {
-    const response = await api.get('/users/me');
+    const response = await api.get('/auth/me');
     return response.data;
   },
 
-  updateProfile: async (userData: Partial<User>): Promise<User> => {
-    const response = await api.put('/users/me', userData);
-    return response.data;
-  },
-
-  // Password management
-  changePassword: async (currentPassword: string, newPassword: string): Promise<{ message: string }> => {
-    const response = await api.post('/auth/change-password', {
-      current_password: currentPassword,
-      new_password: newPassword,
-    });
-    return response.data;
+  // Note: User registration is handled via /users/ endpoint (admin only)
+  // For public registration, this would need to be implemented in backend
+  register: async (userData: RegisterRequest): Promise<User> => {
+    // This endpoint doesn't exist in backend - would need to be created
+    // For now, throwing error to indicate missing implementation
+    throw new Error('Public user registration not implemented in backend. Contact admin to create account.');
   },
 
   // Token validation
   validateToken: async (): Promise<boolean> => {
     try {
-      await api.get('/auth/validate-token');
+      await api.get('/auth/me');
       return true;
     } catch {
       return false;
