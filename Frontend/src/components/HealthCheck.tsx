@@ -7,7 +7,7 @@ const healthCheck = async () => {
 };
 
 export const HealthCheck: React.FC = () => {
-  const { data, isLoading, isError } = useQuery({
+  const { isLoading, isError } = useQuery({
     queryKey: ['health'],
     queryFn: healthCheck,
     retry: 1,
