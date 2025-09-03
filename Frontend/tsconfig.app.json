@@ -18,6 +18,9 @@
     "paths": {
       "@/*": ["./src/*"]
     },
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
 
     /* Linting */
     "strict": true,
