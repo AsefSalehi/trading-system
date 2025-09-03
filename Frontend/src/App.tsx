@@ -5,6 +5,8 @@ import { MainLayout } from './components/Layout/MainLayout';
 import { LoginForm } from './components/Auth/LoginForm';
 import { RegisterForm } from './components/Auth/RegisterForm';
 import { ToastContainer } from './components/Toast/ToastContainer';
+import { ErrorBoundary } from './components/ErrorBoundary';
+import { GlobalLoader } from './components/Loading/GlobalLoader';
 
 import { useToast } from './hooks/useToast';
 
@@ -24,15 +26,7 @@ const AuthenticatedApp: React.FC = () => {
   const [isLoginMode, setIsLoginMode] = useState(true);
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-        <div className="bg-white rounded-2xl shadow-2xl p-12 text-center max-w-md">
-          <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent mx-auto mb-6"></div>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">Loading Trading System</h3>
-          <p className="text-gray-600">Preparing your trading environment...</p>
-        </div>
-      </div>
-    );
+    return <GlobalLoader />;
   }
 
   if (!isAuthenticated) {
@@ -65,11 +59,13 @@ const AppWithToast: React.FC = () => {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <AppWithToast />
-      </AuthProvider>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <AppWithToast />
+        </AuthProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
 
