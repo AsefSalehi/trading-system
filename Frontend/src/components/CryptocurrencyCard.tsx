@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Cryptocurrency } from '../types/cryptocurrency';
-import { cn } from '../lib/utils';
+import { cn } from '@/lib/utils';
 
 interface CryptocurrencyCardProps {
   cryptocurrency: Cryptocurrency;
