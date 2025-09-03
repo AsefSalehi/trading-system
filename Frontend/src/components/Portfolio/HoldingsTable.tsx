@@ -10,11 +10,16 @@ export const HoldingsTable: React.FC<HoldingsTableProps> = ({ holdings }) => {
   const [sortBy, setSortBy] = useState<keyof Holding>('current_value');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
-  const formatCurrency = (amount: number) => {
+  const formatCurrency = (amount: number | undefined) => {
+    const safeAmount = amount ?? 0;
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
-    }).format(amount);
+    }).format(safeAmount);
+  };
+
+  const safeNumber = (value: number | undefined): number => {
+    return value ?? 0;
   };
 
   const formatDate = (dateString: string) => {
@@ -33,17 +38,17 @@ export const HoldingsTable: React.FC<HoldingsTableProps> = ({ holdings }) => {
   const sortedHoldings = [...holdings].sort((a, b) => {
     const aValue = a[sortBy];
     const bValue = b[sortBy];
-    
+
     if (typeof aValue === 'number' && typeof bValue === 'number') {
       return sortOrder === 'asc' ? aValue - bValue : bValue - aValue;
     }
-    
+
     if (typeof aValue === 'string' && typeof bValue === 'string') {
-      return sortOrder === 'asc' 
+      return sortOrder === 'asc'
         ? aValue.localeCompare(bValue)
         : bValue.localeCompare(aValue);
     }
-    
+
     return 0;
   });
 
@@ -76,49 +81,49 @@ export const HoldingsTable: React.FC<HoldingsTableProps> = ({ holdings }) => {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th 
+              <th
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                 onClick={() => handleSort('symbol')}
               >
                 Symbol {getSortIcon('symbol')}
               </th>
-              <th 
+              <th
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                 onClick={() => handleSort('quantity')}
               >
                 Quantity {getSortIcon('quantity')}
               </th>
-              <th 
+              <th
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                 onClick={() => handleSort('average_buy_price')}
               >
                 Avg. Buy Price {getSortIcon('average_buy_price')}
               </th>
-              <th 
+              <th
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                 onClick={() => handleSort('current_price')}
               >
                 Current Price {getSortIcon('current_price')}
               </th>
-              <th 
+              <th
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                 onClick={() => handleSort('total_cost')}
               >
                 Total Cost {getSortIcon('total_cost')}
               </th>
-              <th 
+              <th
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                 onClick={() => handleSort('current_value')}
               >
                 Current Value {getSortIcon('current_value')}
               </th>
-              <th 
+              <th
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                 onClick={() => handleSort('unrealized_pnl')}
               >
                 Unrealized P&L {getSortIcon('unrealized_pnl')}
               </th>
-              <th 
+              <th
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                 onClick={() => handleSort('first_purchase_at')}
               >
@@ -137,7 +142,7 @@ export const HoldingsTable: React.FC<HoldingsTableProps> = ({ holdings }) => {
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {holding.quantity.toFixed(6)}
+                  {safeNumber(holding.quantity).toFixed(6)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   {formatCurrency(holding.average_buy_price)}
@@ -153,17 +158,17 @@ export const HoldingsTable: React.FC<HoldingsTableProps> = ({ holdings }) => {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm">
                   <div className="flex items-center">
-                    {holding.unrealized_pnl >= 0 ? (
+                    {safeNumber(holding.unrealized_pnl) >= 0 ? (
                       <TrendingUp className="h-4 w-4 text-green-600 mr-1" />
                     ) : (
                       <TrendingDown className="h-4 w-4 text-red-600 mr-1" />
                     )}
-                    <div className={holding.unrealized_pnl >= 0 ? 'text-green-600' : 'text-red-600'}>
+                    <div className={safeNumber(holding.unrealized_pnl) >= 0 ? 'text-green-600' : 'text-red-600'}>
                       <div className="font-medium">
                         {formatCurrency(holding.unrealized_pnl)}
                       </div>
                       <div className="text-xs">
-                        ({holding.unrealized_pnl_percentage.toFixed(2)}%)
+                        ({safeNumber(holding.unrealized_pnl_percentage).toFixed(2)}%)
                       </div>
                     </div>
                   </div>
@@ -187,23 +192,23 @@ export const HoldingsTable: React.FC<HoldingsTableProps> = ({ holdings }) => {
           <div className="flex justify-between">
             <span className="text-gray-600">Total Cost:</span>
             <span className="font-semibold">
-              {formatCurrency(holdings.reduce((sum, h) => sum + h.total_cost, 0))}
+              {formatCurrency(holdings.reduce((sum, h) => sum + safeNumber(h.total_cost), 0))}
             </span>
           </div>
           <div className="flex justify-between">
             <span className="text-gray-600">Total Value:</span>
             <span className="font-semibold">
-              {formatCurrency(holdings.reduce((sum, h) => sum + h.current_value, 0))}
+              {formatCurrency(holdings.reduce((sum, h) => sum + safeNumber(h.current_value), 0))}
             </span>
           </div>
           <div className="flex justify-between">
             <span className="text-gray-600">Total P&L:</span>
             <span className={`font-semibold ${
-              holdings.reduce((sum, h) => sum + h.unrealized_pnl, 0) >= 0 
-                ? 'text-green-600' 
+              holdings.reduce((sum, h) => sum + safeNumber(h.unrealized_pnl), 0) >= 0
+                ? 'text-green-600'
                 : 'text-red-600'
             }`}>
-              {formatCurrency(holdings.reduce((sum, h) => sum + h.unrealized_pnl, 0))}
+              {formatCurrency(holdings.reduce((sum, h) => sum + safeNumber(h.unrealized_pnl), 0))}
             </span>
           </div>
         </div>
