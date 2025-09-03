@@ -17,7 +17,7 @@ export interface RiskAlert {
   cryptocurrency_id: number;
   user_id?: number;
   alert_type: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
+  severity: 'low' | 'medium' | 'high' | 'critical' | 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
   title: string;
   message: string;
   threshold_value?: number;
@@ -25,7 +25,15 @@ export interface RiskAlert {
   is_active: boolean;
   created_at: string;
   resolved_at?: string;
+  // Legacy properties for backward compatibility
+  triggered_at?: string;
+  acknowledged?: boolean;
 }
+
+// Helper function to normalize severity levels
+export const normalizeSeverity = (severity: string): 'low' | 'medium' | 'high' | 'critical' => {
+  return severity.toLowerCase() as 'low' | 'medium' | 'high' | 'critical';
+};
 
 export interface RiskAssessmentRequest {
   cryptocurrency_ids: number[];
