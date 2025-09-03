@@ -5,6 +5,7 @@ import { MainLayout } from './components/Layout/MainLayout';
 import { LoginForm } from './components/Auth/LoginForm';
 import { RegisterForm } from './components/Auth/RegisterForm';
 import { ToastContainer } from './components/Toast/ToastContainer';
+import { DebugHelper } from './components/DebugHelper';
 import { useToast } from './hooks/useToast';
 
 // Create a client
@@ -52,6 +53,7 @@ const AppWithToast: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
       <AuthenticatedApp />
       <ToastContainer toasts={toasts} onClose={removeToast} />
+      <DebugHelper />
     </div>
   );
 };

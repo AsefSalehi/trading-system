@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import type { Cryptocurrency } from '../types/cryptocurrency';
-import { cn, formatCurrency, formatLargeNumber, formatPercentage, getValueColor } from '../lib/utils';
-import { TrendingUp, TrendingDown, Star, StarOff, Eye, BarChart3 } from 'lucide-react';
+import { cn, formatCurrency, formatLargeNumber, formatPercentage } from '../lib/utils';
+import { TrendingUp, TrendingDown, Star, StarOff, Eye } from 'lucide-react';
 
 interface CryptocurrencyCardProps {
   cryptocurrency: Cryptocurrency;
@@ -21,7 +21,6 @@ export const CryptocurrencyCard: React.FC<CryptocurrencyCardProps> = ({
   const [isHovered, setIsHovered] = useState(false);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   
-  const priceChangeColor = getValueColor(cryptocurrency.price_change_percentage_24h);
   const isPositiveChange = cryptocurrency.price_change_percentage_24h >= 0;
   
   // Generate a simple sparkline pattern based on price change

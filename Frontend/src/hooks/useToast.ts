@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { ToastProps, ToastType } from '../components/Toast/Toast';
+import { type ToastProps, type ToastType } from '../components/Toast/Toast';
 
 let toastId = 0;
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Toast, ToastProps } from './Toast';
+import { Toast, type ToastProps } from './Toast';
 
 interface ToastContainerProps {
   toasts: ToastProps[];

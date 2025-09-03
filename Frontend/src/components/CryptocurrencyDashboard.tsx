@@ -43,7 +43,7 @@ export const CryptocurrencyDashboard: React.FC = () => {
     localStorage.setItem('cryptoWatchlist', JSON.stringify(watchlist));
   }, [watchlist]);
 
-  const handleNavigateFromWelcome = (view: string) => {
+  const handleNavigateFromWelcome = () => {
     localStorage.setItem('hasVisitedDashboard', 'true');
     setShowWelcome(false);
     // This would need to be passed from parent component
@@ -83,14 +83,12 @@ export const CryptocurrencyDashboard: React.FC = () => {
       symbol_filter: searchTerm || undefined,
     }),
     refetchInterval: isOnline ? 30000 : false, // Only refetch when online
-    onSuccess: () => {
-      setLastUpdateTime(new Date());
-    },
   });
 
   const handleRefresh = () => {
     if (isOnline) {
       refetch();
+      setLastUpdateTime(new Date());
     }
   };
 
@@ -99,7 +97,7 @@ export const CryptocurrencyDashboard: React.FC = () => {
     if (!cryptocurrencies?.items) return [];
 
     if (showOnlyWatchlist && watchlist.length > 0) {
-      return cryptocurrencies.items.filter(crypto => watchlist.includes(crypto.id));
+      return cryptocurrencies.items.filter((crypto: Cryptocurrency) => watchlist.includes(crypto.id));
     }
 
     return cryptocurrencies.items;
@@ -272,7 +270,7 @@ export const CryptocurrencyDashboard: React.FC = () => {
       {/* Cryptocurrency Grid */}
       {filteredCryptocurrencies && filteredCryptocurrencies.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-          {filteredCryptocurrencies.map((crypto) => (
+          {filteredCryptocurrencies.map((crypto: Cryptocurrency) => (
             <CryptocurrencyCard
               key={crypto.id}
               cryptocurrency={crypto}
@@ -308,7 +306,7 @@ export const CryptocurrencyDashboard: React.FC = () => {
           <div className="bg-white rounded-xl shadow-lg p-6 max-w-md mx-auto">
             <p className="text-gray-700 font-medium text-lg">
               Showing <span className="font-bold text-blue-600">{filteredCryptocurrencies.length}</span> of{' '}
-              <span className="font-bold text-blue-600">{cryptocurrencies.total}</span> cryptocurrencies
+              <span className="font-bold text-blue-600">{cryptocurrencies?.total || 0}</span> cryptocurrencies
               {showOnlyWatchlist && (
                 <span className="block text-sm text-yellow-600 mt-1">
                   (Filtered by watchlist)
