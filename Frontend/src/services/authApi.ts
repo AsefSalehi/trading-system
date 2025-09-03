@@ -1,9 +1,8 @@
 import api from './api';
-import type { 
-  User, 
-  LoginRequest, 
-  RegisterRequest, 
-  AuthResponse 
+import type {
+  User,
+  LoginRequest,
+  RegisterRequest
 } from '../types/auth';
 
 export interface Token {
@@ -28,7 +27,7 @@ export const authApi = {
     const formData = new FormData();
     formData.append('username', credentials.username);
     formData.append('password', credentials.password);
-    
+
     const response = await api.post('/auth/login', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
@@ -54,12 +53,10 @@ export const authApi = {
     return response.data;
   },
 
-  // Note: User registration is handled via /users/ endpoint (admin only)
-  // For public registration, this would need to be implemented in backend
-  register: async (userData: RegisterRequest): Promise<User> => {
-    // This endpoint doesn't exist in backend - would need to be created
-    // For now, throwing error to indicate missing implementation
-    throw new Error('Public user registration not implemented in backend. Contact admin to create account.');
+  // Public user registration
+  register: async (userData: RegisterRequest): Promise<Token> => {
+    const response = await api.post('/auth/register', userData);
+    return response.data;
   },
 
   // Token validation

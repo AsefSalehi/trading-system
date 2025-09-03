@@ -75,9 +75,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const register = async (userData: RegisterRequest) => {
     try {
-      // Note: Backend doesn't have public registration endpoint
-      // This would need to be implemented or handled differently
-      throw new Error('Public registration not available. Please contact administrator.');
+      const tokenResponse = await authApi.register(userData);
+      localStorage.setItem('auth_token', tokenResponse.access_token);
+
+      // Get user data after successful registration
+      const userDataResponse = await authApi.getCurrentUser();
+      setUser(userDataResponse);
     } catch (error) {
       console.error('Registration failed:', error);
       throw error;

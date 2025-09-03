@@ -7,10 +7,10 @@ from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.core.security import create_access_token
 from app.db.database import get_sync_db
-from app.schemas.user import Token, User as UserSchema, UserLogin
+from app.schemas.user import Token, User as UserSchema, UserLogin, UserCreate
 from app.services.user_service import UserService
 from app.core.auth import get_current_active_user
-from app.models.user import User
+from app.models.user import User, UserRole
 
 
 router = APIRouter()
@@ -101,6 +101,54 @@ def refresh_token(
 def read_users_me(current_user: User = Depends(get_current_active_user)) -> Any:
     """Get current user"""
     return current_user
+
+
+@router.post("/register", response_model=Token)
+def register_user(user_data: UserCreate, db: Session = Depends(get_sync_db)) -> Any:
+    """Public user registration endpoint"""
+    try:
+        # Check if user already exists
+        existing_user = UserService.get_user_by_username(db, user_data.username)
+        if existing_user:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Username already registered"
+            )
+
+        existing_email = UserService.get_user_by_email(db, user_data.email)
+        if existing_email:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email already registered"
+            )
+
+        # Create new user with default VIEWER role for public registration
+        user_data.role = UserRole.VIEWER  # Force VIEWER role for public registration
+        user = UserService.create_user(db=db, user_create=user_data)
+
+        # Generate access token
+        access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+        access_token = create_access_token(
+            data={"sub": user.username, "user_id": user.id, "role": user.role.value},
+            expires_delta=access_token_expires,
+        )
+
+        return {
+            "access_token": access_token,
+            "token_type": "bearer",
+            "expires_in": settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        }
+
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Registration failed. Please try again."
+        )
 
 
 @router.post("/logout")
