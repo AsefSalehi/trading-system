@@ -11,8 +11,12 @@ engine = create_async_engine(
     settings.DATABASE_URL, echo=True, future=True  # Set to False in production
 )
 
-# Create sync engine for auth (convert asyncpg URL to psycopg2)
-sync_database_url = settings.DATABASE_URL.replace("postgresql+asyncpg://", "postgresql://")
+# Create sync engine for auth (convert async SQLite URL to sync)
+if "sqlite+aiosqlite" in settings.DATABASE_URL:
+    sync_database_url = settings.DATABASE_URL.replace("sqlite+aiosqlite://", "sqlite://")
+else:
+    # For PostgreSQL
+    sync_database_url = settings.DATABASE_URL.replace("postgresql+asyncpg://", "postgresql://")
 sync_engine = create_engine(sync_database_url, echo=True)
 
 # Create session factories
