@@ -8,6 +8,8 @@ from app.api.api_v1.api import api_router
 from app.core.config import settings
 from app.core.logging import logger
 from app.core.redis import redis_client
+from app.core.middleware import LoggingMiddleware, MetricsMiddleware
+from app.core.metrics import get_metrics, get_health_metrics
 
 # Rate limiter
 limiter = Limiter(key_func=get_remote_address)
@@ -23,6 +25,10 @@ app = FastAPI(
 # Add rate limiting
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+# Add custom middleware
+app.add_middleware(LoggingMiddleware)
+app.add_middleware(MetricsMiddleware)
 
 # Set up CORS
 if settings.BACKEND_CORS_ORIGINS:
@@ -63,4 +69,10 @@ async def root():
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy"}
+    return get_health_metrics()
+
+
+@app.get("/metrics")
+async def metrics():
+    """Prometheus metrics endpoint"""
+    return get_metrics()
