@@ -22,6 +22,29 @@ export const RiskDashboard: React.FC = () => {
     queryFn: () => riskApi.getRiskAlerts({}),
   });
 
+  // Fetch risk metrics (legacy support)
+  const { data: riskMetrics } = useQuery({
+    queryKey: ['risk-metrics'],
+    queryFn: () => riskApi.getRiskMetrics(),
+    retry: false,
+  });
+
+  // Fetch risk assessment (legacy support)
+  const { data: riskAssessment } = useQuery({
+    queryKey: ['risk-assessment'],
+    queryFn: () => riskApi.getRiskAssessment(),
+    retry: false,
+  });
+
+  // Create assessment mutation
+  const createAssessmentMutation = useMutation({
+    mutationFn: () => riskApi.createRiskAssessment(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['risk-assessment'] });
+      queryClient.invalidateQueries({ queryKey: ['risk-dashboard'] });
+    },
+  });
+
   // Refresh dashboard mutation
   const refreshMutation = useMutation({
     mutationFn: () => riskApi.getRiskDashboard(),
@@ -33,6 +56,10 @@ export const RiskDashboard: React.FC = () => {
 
   const handleRefresh = () => {
     refreshMutation.mutate();
+  };
+
+  const handleCreateAssessment = () => {
+    createAssessmentMutation.mutate();
   };
 
   const isLoading = dashboardLoading;
