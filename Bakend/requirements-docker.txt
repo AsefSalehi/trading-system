@@ -43,3 +43,6 @@ slowapi==0.1.9
 
 # Monitoring and logging
 prometheus-client==0.22.1
+
+# Trading APIs
+python-binance==1.0.19

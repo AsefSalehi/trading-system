@@ -4,14 +4,60 @@ import logging
 from typing import Dict, List, Optional, Any
 from decimal import Decimal
 from datetime import datetime, timedelta
-from binance import Client, ThreadedWebsocketManager
-from binance.exceptions import BinanceAPIException, BinanceOrderException
 import websocket
 import threading
 import time
 
 from app.core.config import settings
 from app.core.logging import logger
+
+# Optional Binance imports
+try:
+    from binance import Client, ThreadedWebsocketManager
+    from binance.exceptions import BinanceAPIException, BinanceOrderException
+    BINANCE_AVAILABLE = True
+    logger.info("Binance library is available")
+except ImportError:
+    logger.warning("Binance library not available - using mock data")
+    BINANCE_AVAILABLE = False
+
+    # Mock classes for when Binance is not available
+    class Client:
+        def __init__(self, *args, **kwargs):
+            pass
+        def ping(self):
+            pass
+        def get_symbol_ticker(self, symbol):
+            return {'price': '50000.00'}
+        def get_ticker(self, symbol=None):
+            return {'lastPrice': '50000.00', 'priceChange': '1000.00', 'priceChangePercent': '2.00',
+                   'highPrice': '51000.00', 'lowPrice': '49000.00', 'volume': '1000.00',
+                   'quoteVolume': '50000000.00', 'openPrice': '49000.00', 'prevClosePrice': '49000.00',
+                   'count': 1000}
+        def get_all_tickers(self):
+            return [{'symbol': 'BTCUSDT', 'price': '50000.00'}, {'symbol': 'ETHUSDT', 'price': '3000.00'}]
+        def get_klines(self, symbol, interval, limit):
+            return []
+        def get_system_status(self):
+            return {'status': 0, 'msg': 'normal'}
+        def get_server_time(self):
+            return {'serverTime': int(datetime.now().timestamp() * 1000)}
+
+    class ThreadedWebsocketManager:
+        def __init__(self):
+            pass
+        def start(self):
+            pass
+        def stop(self):
+            pass
+        def start_multiplex_socket(self, callback, streams):
+            pass
+
+    class BinanceAPIException(Exception):
+        pass
+
+    class BinanceOrderException(Exception):
+        pass
 
 
 class BinanceMarketDataService:
@@ -84,12 +130,16 @@ class BinanceMarketDataService:
         """Lazy initialization of Binance client"""
         if not self._client_initialized:
             try:
-                self.client = Client()
+                if BINANCE_AVAILABLE:
+                    self.client = Client()
+                    logger.info("Binance client initialized successfully")
+                else:
+                    self.client = Client()  # Mock client
+                    logger.info("Using mock Binance client (library not available)")
                 self._client_initialized = True
-                logger.info("Binance client initialized successfully")
             except Exception as e:
                 logger.warning(f"Binance client initialization failed: {e}")
-                self.client = None
+                self.client = Client()  # Use mock client as fallback
                 self._client_initialized = True  # Mark as attempted
 
     def get_current_price(self, symbol: str) -> Optional[Decimal]:
@@ -102,6 +152,17 @@ class BinanceMarketDataService:
                 return Decimal("50000.00") if symbol.upper() == 'BTC' else Decimal("3000.00")
 
             binance_symbol = self.get_symbol_from_crypto(symbol)
+
+            # If Binance library is not available, return mock prices
+            if not BINANCE_AVAILABLE:
+                mock_prices = {
+                    'BTC': Decimal("50000.00"),
+                    'ETH': Decimal("3000.00"),
+                    'BNB': Decimal("300.00"),
+                    'ADA': Decimal("0.50"),
+                    'SOL': Decimal("100.00")
+                }
+                return mock_prices.get(symbol.upper(), Decimal("100.00"))
 
             # Check cache first (if updated within last 30 seconds)
             if (binance_symbol in self.price_cache and
