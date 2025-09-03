@@ -93,30 +93,63 @@ class PortfolioSummary(BaseModel):
     recent_transactions: List[Dict[str, Any]]
 
 
-# Order Schemas (for future limit orders)
+# Advanced Order Schemas
 class OrderRequest(BaseModel):
-    symbol: str
-    order_type: str = Field(..., pattern="^(market|limit|stop_loss|take_profit)$")
-    transaction_type: str = Field(..., pattern="^(buy|sell)$")
-    quantity: float = Field(..., gt=0)
-    price: Optional[float] = Field(None, gt=0)
-    stop_price: Optional[float] = Field(None, gt=0)
+    symbol: str = Field(..., description="Cryptocurrency symbol (e.g., BTC)")
+    side: str = Field(..., description="Order side: buy or sell")
+    quantity: float = Field(..., gt=0, description="Quantity to trade")
+    price: Optional[float] = Field(None, description="Price for limit orders")
+    amount: Optional[float] = Field(None, description="USD amount for market buy orders")
 
 
 class OrderResponse(BaseModel):
-    id: int
-    symbol: str
-    order_type: str
-    transaction_type: str
-    quantity: float
-    executed_quantity: float
-    price: Optional[float]
-    executed_price: Optional[float]
+    order_id: int
     status: str
-    total_amount: float
-    fee: float
-    created_at: datetime
-    executed_at: Optional[datetime]
+    order_type: str
+    symbol: str
+    side: str
+    quantity: float
+    price: Optional[float] = None
+    stop_price: Optional[float] = None
+    target_price: Optional[float] = None
+    executed_price: Optional[float] = None
+    created_at: str
+    executed_at: Optional[str] = None
+
+
+# Risk Management Schemas
+class RiskMetricsResponse(BaseModel):
+    total_portfolio_value: float
+    cash_percentage: float
+    largest_position_percentage: float
+    daily_pnl_percentage: float
+    total_pnl_percentage: float
+    concentration_risk_score: float
+    overall_risk_score: float
+    recommendations: List[str]
+
+
+# Multi-Exchange Schemas
+class ArbitrageResponse(BaseModel):
+    symbol: str
+    buy_exchange: str
+    sell_exchange: str
+    buy_price: float
+    sell_price: float
+    profit_percentage: float
+    profit_amount: float
+    max_volume: float
+    timestamp: str
+
+
+# Real-time Schemas
+class PriceAlertResponse(BaseModel):
+    alert_id: str
+    symbol: str
+    condition: str
+    threshold: float
+    message: str
+    created_at: str
 
 
 # Trading Session Schemas
