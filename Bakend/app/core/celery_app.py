@@ -6,7 +6,7 @@ celery_app = Celery(
     "trading_backend",
     broker=settings.CELERY_BROKER_URL,
     backend=settings.CELERY_RESULT_BACKEND,
-    include=["app.tasks.crypto_tasks"]
+    include=["app.tasks.crypto_tasks"],
 )
 
 # Configure Celery
@@ -28,18 +28,18 @@ celery_app.conf.beat_schedule = {
     "sync-crypto-data-hourly": {
         "task": "app.tasks.crypto_tasks.sync_cryptocurrency_data",
         "schedule": 3600.0,  # Run every hour
-        "kwargs": {"limit": 200, "provider": "coingecko"}
+        "kwargs": {"limit": 200, "provider": "coingecko"},
     },
     "sync-top-crypto-frequent": {
-        "task": "app.tasks.crypto_tasks.sync_cryptocurrency_data", 
+        "task": "app.tasks.crypto_tasks.sync_cryptocurrency_data",
         "schedule": 300.0,  # Run every 5 minutes
-        "kwargs": {"limit": 50, "provider": "coingecko"}
+        "kwargs": {"limit": 50, "provider": "coingecko"},
     },
     "cleanup-old-price-history": {
         "task": "app.tasks.crypto_tasks.cleanup_old_price_history",
         "schedule": 86400.0,  # Run daily
-        "kwargs": {"days_to_keep": 365}
-    }
+        "kwargs": {"days_to_keep": 365},
+    },
 }
 
 celery_app.conf.timezone = "UTC"

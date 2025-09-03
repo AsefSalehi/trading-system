@@ -18,17 +18,11 @@ from app.core.config import settings
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
 
 # Create test engine
-test_engine = create_async_engine(
-    TEST_DATABASE_URL,
-    echo=False,
-    future=True
-)
+test_engine = create_async_engine(TEST_DATABASE_URL, echo=False, future=True)
 
 # Create test session factory
 TestingSessionLocal = sessionmaker(
-    test_engine,
-    class_=AsyncSession,
-    expire_on_commit=False
+    test_engine, class_=AsyncSession, expire_on_commit=False
 )
 
 
@@ -47,14 +41,14 @@ async def db_session() -> AsyncGenerator[AsyncSession, None]:
     # Create tables
     async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
-    
+
     # Create session
     async with TestingSessionLocal() as session:
         try:
             yield session
         finally:
             await session.close()
-    
+
     # Drop tables after test
     async with test_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
@@ -64,10 +58,10 @@ async def db_session() -> AsyncGenerator[AsyncSession, None]:
 async def client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
     """Create test client with database override"""
     app.dependency_overrides[get_db] = lambda: db_session
-    
+
     async with AsyncClient(app=app, base_url="http://test") as test_client:
         yield test_client
-    
+
     # Clean up
     app.dependency_overrides.clear()
 
@@ -97,7 +91,7 @@ def sample_cryptocurrency_data():
         "price_change_percentage_24h": 2.75,
         "description": "Bitcoin is a decentralized digital currency",
         "website": "https://bitcoin.org",
-        "image_url": "https://bitcoin.org/img/logo.png"
+        "image_url": "https://bitcoin.org/img/logo.png",
     }
 
 
@@ -111,24 +105,24 @@ def sample_cryptocurrency_list():
             "slug": "bitcoin",
             "current_price": 45000.0,
             "market_cap": 850000000000.0,
-            "market_cap_rank": 1
+            "market_cap_rank": 1,
         },
         {
-            "symbol": "ETH", 
+            "symbol": "ETH",
             "name": "Ethereum",
             "slug": "ethereum",
             "current_price": 3000.0,
             "market_cap": 400000000000.0,
-            "market_cap_rank": 2
+            "market_cap_rank": 2,
         },
         {
             "symbol": "ADA",
             "name": "Cardano",
-            "slug": "cardano", 
+            "slug": "cardano",
             "current_price": 0.5,
             "market_cap": 15000000000.0,
-            "market_cap_rank": 10
-        }
+            "market_cap_rank": 10,
+        },
     ]
 
 

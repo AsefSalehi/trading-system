@@ -6,6 +6,7 @@ uvicorn[standard]
 sqlalchemy
 asyncpg
 alembic
+psycopg2-binary
 
 # Redis and caching
 redis
@@ -18,10 +19,12 @@ flower
 # HTTP client for external APIs
 httpx
 aiohttp
+requests
 
 # Data validation and serialization
 pydantic
 pydantic-settings
+email-validator
 
 # Security
 python-jose[cryptography]
@@ -30,6 +33,10 @@ python-multipart
 
 # Environment and configuration
 python-dotenv
+
+# Data analysis and risk assessment
+numpy
+pandas
 
 # Testing
 pytest

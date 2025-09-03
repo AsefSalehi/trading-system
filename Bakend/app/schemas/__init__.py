@@ -1,8 +1,9 @@
 from app.schemas.cryptocurrency import *
+from app.schemas.user import *
 
 __all__ = [
     "CryptocurrencyBase",
-    "CryptocurrencyCreate", 
+    "CryptocurrencyCreate",
     "CryptocurrencyUpdate",
     "Cryptocurrency",
     "CryptocurrencyList",
@@ -14,5 +15,12 @@ __all__ = [
     "ErrorDetail",
     "ErrorResponse",
     "SuccessResponse",
-    "DataUpdateResponse"
+    "DataUpdateResponse",
+    "UserBase",
+    "UserCreate",
+    "UserUpdate",
+    "User",
+    "UserLogin",
+    "Token",
+    "TokenData",
 ]
