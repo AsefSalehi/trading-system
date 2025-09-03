@@ -57,3 +57,6 @@ mypy
 
 # Load testing
 locust
+
+# Trading APIs
+python-binance

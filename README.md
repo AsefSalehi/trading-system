@@ -24,12 +24,14 @@ trading-backend/
 The backend is a FastAPI-based cryptocurrency trading API with real-time data integration.
 
 ```bash
-# Quick start from root directory
-./start-backend.sh
-
-# Or navigate manually
+# Navigate to backend directory
 cd Bakend/
-./setup.sh
+
+# One command setup (recommended)
+./final-setup.sh
+
+# Or manual setup (alternative)
+./setup-manual.sh
 ```
 
 **Features:**

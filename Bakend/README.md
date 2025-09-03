@@ -51,70 +51,59 @@ A comprehensive FastAPI-based cryptocurrency trading backend system that provide
 cd Bakend/
 ```
 
-### Using Docker Compose (Recommended)
+### Option 1: Automated Setup (Recommended)
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd trading-backend
-   ```
+**One command to set up everything:**
 
-2. **Set up environment variables**
-   ```bash
-   cp .env.example .env
-   # Edit .env with your configuration
-   ```
+```bash
+./final-setup.sh
+```
 
-3. **Start all services**
-   ```bash
-   docker-compose up -d
-   ```
+Choose **Option 1** (Clean setup) for a complete fresh installation that:
+- ✅ Handles all Docker setup automatically
+- ✅ Fixes any existing conflicts
+- ✅ Installs all dependencies
+- ✅ Sets up database with migrations
+- ✅ Starts all services
+- ✅ Tests everything works
 
-4. **Run database migrations**
-   ```bash
-   docker-compose exec api alembic upgrade head
-   ```
+### Option 2: Manual Setup (Alternative)
 
-5. **Access the API**
-   - API: http://localhost:8000
-   - API Documentation: http://localhost:8000/docs
-   - Flower (Celery monitoring): http://localhost:5555
+If you prefer manual setup without Docker:
 
-### Manual Installation
+```bash
+./setup-manual.sh
+```
 
-1. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
+This will:
+- Install PostgreSQL and Redis (macOS with Homebrew)
+- Set up Python virtual environment
+- Install all dependencies
+- Run database migrations
+- Start all services
 
-2. **Set up database**
-   ```bash
-   # Create PostgreSQL database
-   createdb trading_db
-   
-   # Run migrations
-   alembic upgrade head
-   ```
+### Option 3: Docker Compose (Advanced)
 
-3. **Start Redis**
-   ```bash
-   redis-server
-   ```
+For advanced users who want to customize the Docker setup:
 
-4. **Start Celery worker** (in separate terminal)
-   ```bash
-   celery -A app.core.celery_app worker --loglevel=info
-   ```
+```bash
+# Set up environment
+cp .env.example .env
+# Edit .env with your configuration
 
-5. **Start Celery beat** (in separate terminal)
-   ```bash
-   celery -A app.core.celery_app beat --loglevel=info
-   ```
+# Start services
+docker-compose up -d
 
-6. **Start the API server**
-   ```bash
-   uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
-   ```
+# Run migrations
+docker-compose exec api alembic upgrade head
+```
+
+### Access Your Services
+
+After any setup method:
+- **API**: http://localhost:8000
+- **API Documentation**: http://localhost:8000/docs  
+- **Celery Monitoring**: http://localhost:5555
 
 ## 🔧 Configuration
 

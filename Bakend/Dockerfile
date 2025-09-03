@@ -25,8 +25,8 @@ RUN apt-get update \
 RUN pip install --upgrade pip setuptools wheel
 
 # Install Python dependencies with increased timeout and retries
-COPY requirements-docker.txt .
-RUN pip install --timeout=1000 --retries=5 -r requirements-docker.txt
+COPY requirements.txt .
+RUN pip install --timeout=1000 --retries=5 -r requirements.txt
 
 # Copy project
 COPY . .
