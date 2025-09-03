@@ -119,11 +119,23 @@ start_docker_services() {
         echo "⏳ Waiting for services to start..."
         sleep 15
 
+        # Check migration status
+        echo "🔍 Checking migration status..."
+        sleep 5  # Give migrations time to complete
+
+        if docker-compose ps migrate | grep -q "Exit 0"; then
+            echo "✅ Database migrations completed successfully"
+        else
+            echo "⚠️ Migration issues detected. Checking logs..."
+            docker-compose logs migrate
+            echo ""
+            echo "💡 This might be a timing issue. Let's try manual migration..."
+            docker-compose exec api alembic upgrade head || echo "Manual migration also failed"
+        fi
+
         # Check if API service is running
         if docker-compose ps api | grep -q "Up"; then
-            # Run database migrations
-            echo "🔄 Running database migrations..."
-            docker-compose exec api alembic upgrade head
+            echo "✅ API service is running"
 
             echo "✅ Docker services started successfully!"
             echo ""
@@ -131,8 +143,12 @@ start_docker_services() {
             echo "   API: http://localhost:8000"
             echo "   API Docs: http://localhost:8000/docs"
             echo "   Flower (Celery): http://localhost:5555"
+            echo ""
+            echo "🔍 Service Status:"
+            docker-compose ps
         else
-            echo "❌ API service failed to start. Check logs with: docker-compose logs api"
+            echo "❌ API service failed to start. Checking logs..."
+            docker-compose logs api
             echo "💡 Try manual setup: ./setup-manual.sh"
             return 1
         fi
